@@ -80,9 +80,7 @@ class DashboardScreen extends ConsumerWidget {
                 recentExpenses.when(
                   data: (expenses) {
                     final recent = expenses.take(5).toList();
-                    if (recent.isEmpty) {
-                      return const _EmptyExpenses();
-                    }
+                    if (recent.isEmpty) return const _EmptyExpenses();
                     return Column(
                       children: recent
                           .map((e) => _ExpenseTile(expense: e))
@@ -100,8 +98,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 }
-
-// ─── Budget Card ───────────────────────────────────────────────────────────
 
 class _BudgetCard extends StatelessWidget {
   final double spent;
@@ -141,25 +137,29 @@ class _BudgetCard extends StatelessWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.6),
+                                .withValues(alpha: 0.6),
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       CurrencyFormatter.format(spent, currency),
-                      style:
-                          Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: color,
-                              ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
                     ),
                   ],
                 ),
                 CircleAvatar(
-                  backgroundColor: color.withOpacity(0.1),
+                  backgroundColor: color.withValues(alpha: 0.1),
                   radius: 28,
                   child: Icon(
-                    isOverBudget ? Icons.warning_rounded : Icons.account_balance_wallet,
+                    isOverBudget
+                        ? Icons.warning_rounded
+                        : Icons.account_balance_wallet,
                     color: color,
                     size: 28,
                   ),
@@ -172,8 +172,9 @@ class _BudgetCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 10,
-                backgroundColor:
-                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ),
@@ -191,7 +192,7 @@ class _BudgetCard extends StatelessWidget {
                             : Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.6),
+                                .withValues(alpha: 0.6),
                       ),
                 ),
                 Text(
@@ -200,7 +201,7 @@ class _BudgetCard extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                       ),
                 ),
               ],
@@ -212,11 +213,8 @@ class _BudgetCard extends StatelessWidget {
   }
 }
 
-// ─── Category Pie Chart ────────────────────────────────────────────────────
-
 class _CategoryChart extends StatelessWidget {
   final Map<String, double> totals;
-
   const _CategoryChart({required this.totals});
 
   @override
@@ -315,11 +313,8 @@ class _CategoryChart extends StatelessWidget {
   }
 }
 
-// ─── Expense Tile ──────────────────────────────────────────────────────────
-
 class _ExpenseTile extends StatelessWidget {
   final dynamic expense;
-
   const _ExpenseTile({required this.expense});
 
   @override
@@ -328,8 +323,7 @@ class _ExpenseTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor:
-              Theme.of(context).colorScheme.primaryContainer,
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           child: Text(
             AppConstants.categoryEmojis[expense.category] ?? '💰',
             style: const TextStyle(fontSize: 20),
@@ -354,8 +348,6 @@ class _ExpenseTile extends StatelessWidget {
     );
   }
 }
-
-// ─── Helper Widgets ────────────────────────────────────────────────────────
 
 class _LoadingCard extends StatelessWidget {
   final double height;
@@ -388,7 +380,8 @@ class _ErrorCard extends StatelessWidget {
                 child: Text(
                   'Error: $message',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onErrorContainer),
+                      color:
+                          Theme.of(context).colorScheme.onErrorContainer),
                 ),
               ),
             ],
@@ -427,7 +420,8 @@ class _EmptyExpenses extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey),
+              Icon(Icons.receipt_long_outlined,
+                  size: 48, color: Colors.grey),
               SizedBox(height: 8),
               Text('No expenses yet. Add your first one!',
                   style: TextStyle(color: Colors.grey)),
