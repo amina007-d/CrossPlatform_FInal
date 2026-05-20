@@ -14,12 +14,21 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       _dao.watchAllExpenses().map((list) => list.map(_toModel).toList());
 
   @override
+<<<<<<< HEAD
   Stream<List<ExpenseModel>> watchMonthlyExpenses(DateTime month) =>
       _dao.watchMonthlyExpenses(month).map((list) => list.map(_toModel).toList());
 
   @override
   Future<double> getMonthlyTotal(DateTime month) =>
       _dao.getMonthlyTotal(month);
+=======
+  Stream<List<ExpenseModel>> watchMonthlyExpenses(DateTime month) => _dao
+      .watchMonthlyExpenses(month)
+      .map((list) => list.map(_toModel).toList());
+
+  @override
+  Future<double> getMonthlyTotal(DateTime month) => _dao.getMonthlyTotal(month);
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
 
   @override
   Future<Map<String, double>> getCategoryTotals(DateTime month) =>
@@ -61,6 +70,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }
 
   ExpenseModel _toModel(Expense e) => ExpenseModel(
+<<<<<<< HEAD
         id: e.id,
         title: e.title,
         amount: e.amount,
@@ -70,4 +80,15 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
         date: e.date,
         createdAt: e.createdAt,
       );
+=======
+    id: e.id,
+    title: e.title,
+    amount: e.amount,
+    category: e.category,
+    currency: e.currency,
+    note: e.note,
+    date: e.date,
+    createdAt: e.createdAt,
+  );
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
 }

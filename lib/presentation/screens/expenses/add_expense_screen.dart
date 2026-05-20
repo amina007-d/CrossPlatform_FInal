@@ -32,7 +32,12 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     final e = widget.editExpense;
     _titleCtrl = TextEditingController(text: e?['title'] ?? '');
     _amountCtrl = TextEditingController(
+<<<<<<< HEAD
         text: e != null ? (e['amount'] as double).toStringAsFixed(2) : '');
+=======
+      text: e != null ? (e['amount'] as double).toStringAsFixed(2) : '',
+    );
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
     _noteCtrl = TextEditingController(text: e?['note'] ?? '');
     _selectedCategory = e?['category'] ?? AppConstants.categories.first;
     _selectedDate = e != null
@@ -99,11 +104,16 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
   Widget build(BuildContext context) {
     final budgetAsync = ref.watch(budgetSettingsProvider);
     final currency = budgetAsync.whenData((s) => s.currency).value ?? 'USD';
+<<<<<<< HEAD
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Edit Expense' : 'Add Expense'),
       ),
+=======
+    return Scaffold(
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Expense' : 'Add Expense')),
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
       body: Form(
         key: _formKey,
         child: ListView(
@@ -131,8 +141,14 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 prefixIcon: const Icon(Icons.attach_money),
                 border: const OutlineInputBorder(),
               ),
+<<<<<<< HEAD
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
+=======
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Enter amount';
                 if (double.tryParse(v) == null) return 'Invalid number';
@@ -151,11 +167,20 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 border: OutlineInputBorder(),
               ),
               items: AppConstants.categories
+<<<<<<< HEAD
                   .map((c) => DropdownMenuItem(
                         value: c,
                         child: Text(
                             '${AppConstants.categoryEmojis[c] ?? ''} $c'),
                       ))
+=======
+                  .map(
+                    (c) => DropdownMenuItem(
+                      value: c,
+                      child: Text('${AppConstants.categoryEmojis[c] ?? ''} $c'),
+                    ),
+                  )
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
                   .toList(),
               onChanged: (v) => setState(() => _selectedCategory = v!),
             ),
@@ -170,9 +195,13 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   prefixIcon: Icon(Icons.calendar_today),
                   border: OutlineInputBorder(),
                 ),
+<<<<<<< HEAD
                 child: Text(
                   DateFormat('MMMM dd, yyyy').format(_selectedDate),
                 ),
+=======
+                child: Text(DateFormat('MMMM dd, yyyy').format(_selectedDate)),
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
               ),
             ),
             const SizedBox(height: 16),
@@ -210,4 +239,8 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4e4595e570435b0f29df40f49d9ad6fa4eab78e7
