@@ -10,6 +10,8 @@ import '../../domain/models/budget_settings.dart';
 import '../../domain/models/shared_expense_model.dart';
 import '../../domain/repositories/repositories.dart';
 
+// ─── Database ──────────────────────────────────────────────────────────────
+
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
   ref.onDispose(db.close);
@@ -20,6 +22,7 @@ final expenseDaoProvider = Provider<ExpenseDao>((ref) {
   return ExpenseDao(ref.watch(databaseProvider));
 });
 
+// ─── Repositories ──────────────────────────────────────────────────────────
 
 final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
   return ExpenseRepositoryImpl(ref.watch(expenseDaoProvider));
@@ -37,6 +40,7 @@ final householdRepositoryProvider = Provider<HouseholdRepository>((ref) {
   return HouseholdRepositoryImpl();
 });
 
+// ─── Budget Settings ───────────────────────────────────────────────────────
 
 final budgetSettingsProvider =
     AsyncNotifierProvider<BudgetNotifier, BudgetSettings>(BudgetNotifier.new);
@@ -54,6 +58,8 @@ class BudgetNotifier extends AsyncNotifier<BudgetSettings> {
   }
 }
 
+// ─── Expenses ──────────────────────────────────────────────────────────────
+
 final selectedMonthProvider = StateProvider<DateTime>((ref) {
   final now = DateTime.now();
   return DateTime(now.year, now.month);
@@ -68,6 +74,8 @@ final allExpensesProvider = StreamProvider<List<ExpenseModel>>((ref) {
   return ref.watch(expenseRepositoryProvider).watchAllExpenses();
 });
 
+// ─── Real-time total from stream ───────────────────────────────────────────
+
 final monthlyTotalProvider = StreamProvider<double>((ref) {
   final month = ref.watch(selectedMonthProvider);
   // Derive total from the live stream of expenses
@@ -77,6 +85,8 @@ final monthlyTotalProvider = StreamProvider<double>((ref) {
       .map((expenses) =>
           expenses.fold<double>(0.0, (sum, e) => sum + e.amount));
 });
+
+// ─── Real-time category totals from stream ─────────────────────────────────
 
 final categoryTotalsProvider = StreamProvider<Map<String, double>>((ref) {
   final month = ref.watch(selectedMonthProvider);
@@ -92,6 +102,7 @@ final categoryTotalsProvider = StreamProvider<Map<String, double>>((ref) {
   });
 });
 
+// ─── Currency ──────────────────────────────────────────────────────────────
 
 final selectedFromCurrencyProvider = StateProvider<String>((ref) => 'USD');
 final selectedToCurrencyProvider = StateProvider<String>((ref) => 'EUR');
@@ -109,6 +120,7 @@ final conversionResultProvider = FutureProvider<double>((ref) {
   return ref.watch(currencyRepositoryProvider).convert(amount, from, to);
 });
 
+// ─── Household ─────────────────────────────────────────────────────────────
 
 final householdIdProvider = StateProvider<String>((ref) => '');
 

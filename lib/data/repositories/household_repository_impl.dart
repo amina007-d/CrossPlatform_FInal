@@ -22,8 +22,7 @@ class HouseholdRepositoryImpl implements HouseholdRepository {
         .orderBy('date', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) =>
-                SharedExpenseModel.fromFirestore(doc.data(), doc.id))
+            .map((doc) => SharedExpenseModel.fromFirestore(doc.data(), doc.id))
             .toList());
   }
 

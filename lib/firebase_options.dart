@@ -23,9 +23,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -51,28 +57,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAqMhgfow9B4UDjg96MCIrAyoYG-31YTnk',
-    appId: '1:800458721082:android:8f9da5b3d7e51616013203',
+    appId: '1:800458721082:android:258b2e281c80c1f5013203',
     messagingSenderId: '800458721082',
     projectId: 'financetracker-finaldemo',
     storageBucket: 'financetracker-finaldemo.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBp1iZTszfd449GuOHE1BNZQn-55b6MdHE',
-    appId: '1:800458721082:ios:ebee0279df7f6463013203',
-    messagingSenderId: '800458721082',
-    projectId: 'financetracker-finaldemo',
-    storageBucket: 'financetracker-finaldemo.firebasestorage.app',
-    iosBundleId: 'com.example.finalProject',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBp1iZTszfd449GuOHE1BNZQn-55b6MdHE',
-    appId: '1:800458721082:ios:ebee0279df7f6463013203',
-    messagingSenderId: '800458721082',
-    projectId: 'financetracker-finaldemo',
-    storageBucket: 'financetracker-finaldemo.firebasestorage.app',
-    iosBundleId: 'com.example.finalProject',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

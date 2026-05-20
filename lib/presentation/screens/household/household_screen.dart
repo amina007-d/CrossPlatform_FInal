@@ -16,7 +16,6 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
   @override
   void initState() {
     super.initState();
-    // Load household ID from settings
     Future.microtask(() async {
       final settings = await ref.read(budgetSettingsProvider.future);
       if (settings.householdId.isNotEmpty) {
@@ -36,11 +35,15 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
     final titleCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
     final noteCtrl = TextEditingController();
+    final membersCtrl = TextEditingController();
     String category = AppConstants.categories.first;
-    String currency = 'USD';
 
     final budgetSettings = await ref.read(budgetSettingsProvider.future);
-    final userName = budgetSettings.userName;
+    final userName = budgetSettings.userName.isEmpty ? 'Me' : budgetSettings.userName;
+    final currency = budgetSettings.currency;
+
+    // Pre-fill with current user
+    membersCtrl.text = userName;
 
     await showDialog(
       context: context,
@@ -61,34 +64,18 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
                         v == null || v.isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: amountCtrl,
-                          decoration: const InputDecoration(
-                              labelText: 'Amount',
-                              border: OutlineInputBorder()),
-                          keyboardType: TextInputType.number,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) return 'Required';
-                            if (double.tryParse(v) == null)
-                              return 'Invalid';
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      DropdownButton<String>(
-                        value: currency,
-                        items: AppConstants.currencies
-                            .map((c) => DropdownMenuItem(
-                                value: c, child: Text(c)))
-                            .toList(),
-                        onChanged: (v) =>
-                            setDialogState(() => currency = v!),
-                      ),
-                    ],
+                  TextFormField(
+                    controller: amountCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Amount ($currency)',
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Required';
+                      if (double.tryParse(v) == null) return 'Invalid';
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
@@ -104,6 +91,19 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
                         .toList(),
                     onChanged: (v) =>
                         setDialogState(() => category = v!),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: membersCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Split between',
+                      hintText: 'Amina, Nazerke, Erasyl',
+                      helperText: 'Separate names with commas',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.group),
+                    ),
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -123,17 +123,25 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
             FilledButton(
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
+
+                // Parse members from comma-separated string
+                final members = membersCtrl.text
+                    .split(',')
+                    .map((e) => e.trim())
+                    .where((e) => e.isNotEmpty)
+                    .toList();
+
                 final expense = SharedExpenseModel(
                   title: titleCtrl.text.trim(),
                   amount: double.parse(amountCtrl.text),
                   currency: currency,
                   category: category,
-                  paidBy: userName.isEmpty ? 'Me' : userName,
+                  paidBy: userName,
                   note: noteCtrl.text.trim().isEmpty
                       ? null
                       : noteCtrl.text.trim(),
                   date: DateTime.now(),
-                  splitBetween: [userName.isEmpty ? 'Me' : userName],
+                  splitBetween: members,
                 );
                 await ref
                     .read(householdRepositoryProvider)
@@ -268,7 +276,8 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
                                 const EdgeInsets.symmetric(horizontal: 16),
                             itemCount: expenses.length,
                             itemBuilder: (context, index) =>
-                                _SharedExpenseTile(expense: expenses[index]),
+                                _SharedExpenseTile(
+                                    expense: expenses[index]),
                           ),
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
@@ -288,62 +297,79 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
 
 class _SharedExpenseTile extends ConsumerWidget {
   final SharedExpenseModel expense;
-
   const _SharedExpenseTile({required this.expense});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-          child: Text(
-            AppConstants.categoryEmojis[expense.category] ?? '💰',
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-        title: Text(expense.title,
-            style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
           children: [
-            Text('Paid by: ${expense.paidBy}',
-                style: Theme.of(context).textTheme.bodySmall),
-            Text(DateFormatter.formatDate(expense.date),
-                style: Theme.of(context).textTheme.bodySmall),
-            if (expense.splitBetween.length > 1)
-              Text(
-                '${CurrencyFormatter.format(expense.perPersonAmount, expense.currency)}/person',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+            CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+              child: Text(
+                AppConstants.categoryEmojis[expense.category] ?? '💰',
+                style: const TextStyle(fontSize: 20),
               ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(expense.title,
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Paid by: ${expense.paidBy}',
+                      style: Theme.of(context).textTheme.bodySmall),
+                  Text(DateFormatter.formatDate(expense.date),
+                      style: Theme.of(context).textTheme.bodySmall),
+                  if (expense.splitBetween.length > 1)
+                    Text(
+                      'Split: ${expense.splitBetween.join(', ')}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                    ),
+                  if (expense.splitBetween.length > 1)
+                    Text(
+                      '${CurrencyFormatter.format(expense.perPersonAmount, expense.currency)}/person',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  CurrencyFormatter.format(expense.amount, expense.currency),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.delete_outline, size: 20),
+                  onPressed: () async {
+                    final householdId = ref.read(householdIdProvider);
+                    await ref
+                        .read(householdRepositoryProvider)
+                        .deleteSharedExpense(householdId, expense.id!);
+                  },
+                ),
+              ],
+            ),
           ],
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              CurrencyFormatter.format(expense.amount, expense.currency),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 18),
-              onPressed: () async {
-                final householdId = ref.read(householdIdProvider);
-                await ref
-                    .read(householdRepositoryProvider)
-                    .deleteSharedExpense(householdId, expense.id!);
-              },
-            ),
-          ],
-        ),
-        isThreeLine: true,
       ),
     );
   }
