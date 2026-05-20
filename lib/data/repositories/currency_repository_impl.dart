@@ -65,3 +65,4 @@ class CurrencyRepositoryImpl implements CurrencyRepository {
     }
   }
 }
+/// Example:
