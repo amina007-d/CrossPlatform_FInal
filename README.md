@@ -6,9 +6,9 @@ A cross-platform mobile application built with Flutter for the Cross-Platform Mo
 
 | Member | Responsibilities |
 |---|---|
-| Amina | Project architecture, Drift database, Riverpod providers, go_router navigation, Dashboard screen, Household screen |
+| Amina | Project architecture, Drift database, Riverpod providers, Dashboard screen, Household screen |
 | Nazerke | FastForex API integration, Currency Repository, Currency Converter screen, Android network configuration |
-| Erasyl | Expense and Budget repositories, Expenses screen, Add/Edit Expense screen, Settings screen, SharedPreferences |
+| Erasyl | Expense and Budget repositories, Expenses screen, Add/Edit Expense screen, go_router navigation, Settings screen, SharedPreferences |
 
 ## Features
 
